@@ -30,10 +30,25 @@ def scrape_box_office(year):
     box_data = pd.DataFrame(appended_data, columns = [
         'rank', 'title', 'worldwide', 'domestic', 'domestic_pct', 'foreign', 'foreign_pct'
     ])
+
+    box_data.replace("-", np.nan, inplace=True)
+
+    box_data['worldwide'] = box_data['worldwide'].str.replace('$', '').str.replace(',', '')
+    box_data['domestic'] = box_data['domestic'].str.replace('$', '').str.replace(',', '')
+    box_data['foreign'] = box_data['foreign'].str.replace('$', '').str.replace(',', '')
+    box_data['domestic_pct'] = box_data['domestic_pct'].str.replace('%', '').str.replace('<', '')
+    box_data['foreign_pct'] = box_data['foreign_pct'].str.replace('%', '').str.replace('<', '')
+
+    box_data['worldwide'] = pd.to_numeric(box_data['worldwide'], errors='coerce')
+    box_data['domestic'] = pd.to_numeric(box_data['domestic'], errors='coerce')
+    box_data['foreign'] = pd.to_numeric(box_data['foreign'], errors='coerce')
+    box_data['domestic_pct'] = pd.to_numeric(box_data['domestic_pct'], errors='coerce')
+    box_data['foreign_pct'] = pd.to_numeric(box_data['foreign_pct'], errors='coerce')
+
     box_data.to_csv(f'datasets/box_office_{year}.csv', index=False)
 
 
 current_year = date.today().year
-years = range(1977, current_year)
+years = range(1977, current_year+1)
 for year in years:
     scrape_box_office(year)
